@@ -1,0 +1,33 @@
+# Ambiente local e segredos
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+env_ci_test/
+
+# Notebooks, roteiros e materiais de apresentacao locais
+*.ipynb
+ROTEIRO*.md
+DOCUMENTACAO*.md
+EXPLICA*.md
+*PASSO A PASSO*.md
+
+# Sistema/IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
