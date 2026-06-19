@@ -34,3 +34,27 @@ def test_criar_prato_invalido(client):
     invalido = {"nome": "X", "categoria": "pizza", "preco": -10}
     response = client.post("/pratos", json=invalido)
     assert response.status_code == 422
+
+
+@pytest.mark.validacao
+def test_preco_promocional_maior_que_preco_retorna_422(client):
+    invalido = {
+        "nome": "Pizza Promocional",
+        "categoria": "pizza",
+        "preco": 50.0,
+        "preco_promocional": 55.0,
+    }
+    response = client.post("/pratos", json=invalido)
+    assert response.status_code == 422
+
+
+@pytest.mark.validacao
+def test_preco_promocional_com_desconto_maior_que_50_retorna_422(client):
+    invalido = {
+        "nome": "Pizza Super Desconto",
+        "categoria": "pizza",
+        "preco": 50.0,
+        "preco_promocional": 20.0,
+    }
+    response = client.post("/pratos", json=invalido)
+    assert response.status_code == 422

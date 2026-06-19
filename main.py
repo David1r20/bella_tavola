@@ -1,18 +1,26 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from routers import bebidas, pedidos, pratos, predict, reservas
 from starlette.exceptions import HTTPException
-from routers import pratos, bebidas, reservas, predict, pedidos
+
 from config import settings
 
 app = FastAPI(title=settings.app_name, version=settings.app_version)
 
 
-# Handlers de erro customizados (Exercício 2.5 do Caderno 2)
+# Handlers de erro customizados (Exercicio 2.6 do caderno FastAPI)
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
-        status_code=422, content={"erro": "Dados inválidos", "detalhes": exc.errors()}
+        status_code=422,
+        content=jsonable_encoder(
+            {
+                "erro": "Dados invalidos",
+                "detalhes": exc.errors(),
+            }
+        ),
     )
 
 
@@ -21,7 +29,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(status_code=exc.status_code, content={"erro": exc.detail})
 
 
-# Inclusão dos routers (Exercício 3 do Caderno 2 e Caderno 3)
+# Inclusao dos routers (Exercicio 3 do caderno FastAPI)
 app.include_router(pratos.router, prefix="/pratos", tags=["Pratos"])
 app.include_router(bebidas.router, prefix="/bebidas", tags=["Bebidas"])
 app.include_router(reservas.router, prefix="/reservas", tags=["Reservas"])

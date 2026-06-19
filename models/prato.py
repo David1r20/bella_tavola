@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class PratoInput(BaseModel):
@@ -9,6 +10,22 @@ class PratoInput(BaseModel):
     preco_promocional: Optional[float] = Field(default=None, gt=0)
     descricao: Optional[str] = Field(default=None, max_length=500)
     disponivel: bool = True
+
+    @field_validator("preco_promocional")
+    @classmethod
+    def validar_preco_promocional(cls, v, info):
+        if v is None or "preco" not in info.data:
+            return v
+
+        preco_original = info.data["preco"]
+        if v >= preco_original:
+            raise ValueError("Preco promocional deve ser menor que o preco original")
+
+        desconto = (preco_original - v) / preco_original
+        if desconto > 0.5:
+            raise ValueError("Desconto nao pode ser maior que 50% do preco original")
+
+        return v
 
 
 class PratoOutput(BaseModel):

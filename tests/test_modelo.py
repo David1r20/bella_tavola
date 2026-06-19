@@ -115,3 +115,30 @@ def test_endpoint_predict_campo_invalido_retorna_422(client, campo, valor_invali
     payload = {**PAYLOAD_VALIDO, campo: valor_invalido}
     response = client.post("/ml/predict", json=payload)
     assert response.status_code == 422
+
+
+@pytest.mark.integracao
+def test_health_modelo_retorna_ok(client):
+    response = client.get("/ml/health")
+    assert response.status_code == 200
+    dados = response.json()
+    assert dados["api"] == "ok"
+    assert dados["model"] == "ok"
+    assert "model_repo" in dados
+
+
+@pytest.mark.integracao
+def test_health_modelo_retorna_degraded_quando_modelo_falha(client, monkeypatch):
+    from routers import predict
+
+    def falhar_ao_carregar_modelo():
+        raise RuntimeError("falha simulada no modelo")
+
+    monkeypatch.setattr(predict, "get_model", falhar_ao_carregar_modelo)
+
+    response = client.get("/ml/health")
+    assert response.status_code == 503
+    dados = response.json()
+    assert dados["api"] == "ok"
+    assert dados["model"] == "degraded"
+    assert "falha simulada" in dados["detail"]

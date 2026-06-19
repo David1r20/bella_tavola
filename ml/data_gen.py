@@ -1,13 +1,15 @@
+from pathlib import Path
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Tuple
 
 
 def gerar_dataset(
     n_samples: int = 1000, seed: int = 42, proporcao_positivos: float = 0.3
 ) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
     """
-    Gera dataset sintético de detecção de fraude.
+    Gera dataset sintetico de deteccao de fraude.
     """
     if not (0.05 <= proporcao_positivos <= 0.95):
         raise ValueError("proporcao_positivos deve estar entre 0.05 e 0.95")
@@ -53,5 +55,6 @@ def gerar_dataset(
 
 if __name__ == "__main__":
     df, X, y = gerar_dataset()
-    df.to_csv("c:/Users/DRN/Desktop/projeto aula/bella_tavola/ml/data.csv", index=False)
-    print("Dataset gerado com sucesso.")
+    output_path = Path(__file__).with_name("data.csv")
+    df.to_csv(output_path, index=False)
+    print(f"Dataset gerado com sucesso em {output_path}.")

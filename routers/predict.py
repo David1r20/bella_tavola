@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
 from ml.model_utils import load_model
 from pydantic import BaseModel, Field
 
@@ -69,6 +70,13 @@ async def health():
     try:
         model = get_model()
         model.predict(np.zeros((1, 5)))
-        return {"status": "ok", "model": "loaded"}
+        body = {"api": "ok", "model": "ok", "model_repo": REPO_ID or "local-v1"}
+        return JSONResponse(content=body, status_code=200)
     except Exception as e:
-        return {"status": "degraded", "error": str(e)}
+        body = {
+            "api": "ok",
+            "model": "degraded",
+            "model_repo": REPO_ID or "local-v1",
+            "detail": str(e),
+        }
+        return JSONResponse(content=body, status_code=503)

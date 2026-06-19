@@ -1,8 +1,13 @@
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+from pathlib import Path
+
 import joblib
+import numpy as np
 from ml.data_gen import gerar_dataset
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+
+MODEL_PATH = Path(__file__).with_name("model.pkl")
 
 
 def treinar():
@@ -16,12 +21,24 @@ def treinar():
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
-    print("Relatório de Classificação:")
-    print(classification_report(y_test, y_pred, target_names=["legítimo", "fraude"]))
+    print("Relatorio de Classificacao:")
+    print(classification_report(y_test, y_pred, target_names=["legitimo", "fraude"]))
 
-    model_path = "c:/Users/DRN/Desktop/projeto aula/bella_tavola/ml/model.pkl"
-    joblib.dump(model, model_path)
-    print(f"Modelo salvo em {model_path}")
+    joblib.dump(model, MODEL_PATH)
+    tamanho_kb = MODEL_PATH.stat().st_size / 1024
+    print(f"Modelo salvo em {MODEL_PATH} ({tamanho_kb:.1f} KB)")
+
+    model_carregado = joblib.load(MODEL_PATH)
+    amostra = X_test[:5]
+    pred_original = model.predict(amostra)
+    pred_carregado = model_carregado.predict(amostra)
+
+    assert np.array_equal(pred_original, pred_carregado), "Predicoes divergem!"
+    print("Artefato validado: predicoes identicas")
+    print(f"Predicoes: {pred_carregado}")
+    print(f"Probabilidades: {model_carregado.predict_proba(amostra).round(3)}")
+
+    return df, model
 
 
 if __name__ == "__main__":
