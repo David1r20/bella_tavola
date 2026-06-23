@@ -1,8 +1,9 @@
+from datetime import datetime
+from typing import List
+
 from fastapi import APIRouter, HTTPException
 from models.pedido import PedidoInput, PedidoOutput
-from routers.pratos import pratos
-from typing import List
-from datetime import datetime
+from storage import buscar_prato_db
 
 router = APIRouter()
 pedidos_db = []
@@ -15,18 +16,13 @@ async def listar_pedidos():
 
 @router.post("/", response_model=PedidoOutput, status_code=201)
 async def criar_pedido(pedido: PedidoInput):
-    # Buscar o prato para validar e pegar o preço
-    prato_alvo = None
-    for p in pratos:
-        if p["id"] == pedido.prato_id:
-            prato_alvo = p
-            break
+    prato_alvo = buscar_prato_db(pedido.prato_id)
 
     if not prato_alvo:
-        raise HTTPException(status_code=404, detail="Prato não encontrado")
+        raise HTTPException(status_code=404, detail="Prato nao encontrado")
 
     if not prato_alvo.get("disponivel", True):
-        raise HTTPException(status_code=400, detail="Prato indisponível no momento")
+        raise HTTPException(status_code=400, detail="Prato indisponivel no momento")
 
     valor_total = prato_alvo["preco"] * pedido.quantidade
 

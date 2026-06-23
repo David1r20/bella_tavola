@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     debug: bool = False
     max_mesas: int = 20
     max_pessoas_por_mesa: int = 10
+    database_path: str = "data/bella_tavola.db"
 
 
 settings = Settings()

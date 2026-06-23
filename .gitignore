@@ -3,6 +3,11 @@
 .env.*
 !.env.example
 
+# Dados locais gerados em runtime
+data/
+*.sqlite
+*.db
+
 # Python
 __pycache__/
 *.py[cod]
